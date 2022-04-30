@@ -1,0 +1,14 @@
+# Data preparation
+
+give an outline of the data and major challenges
+```{r}
+# Load the packages
+library(readr)
+library(dplyr)
+```
+```{r}
+# Read in the data from the raw folder
+stroke_dt <- read_csv("data/raw/stroke.csv")
+#
+```
+
