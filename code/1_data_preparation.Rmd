@@ -1,14 +1,102 @@
 # Data preparation
 
 give an outline of the data and major challenges
+
 ```{r}
 # Load the packages
 library(readr)
 library(dplyr)
 ```
+
 ```{r}
 # Read in the data from the raw folder
-stroke_dt <- read_csv("data/raw/stroke.csv")
+#stroke_dt <- read_csv("stroke.csv")
+View(stroke)
+#stroke_dt <- stroke
 #
 ```
 
+## Cleaning & Understanding Data
+
+```{r}
+# Check the dimensions and structure of the data
+glimpse(stroke_dt)
+str(stroke_dt)
+summary(stroke_dt)
+
+```
+
+| using `glimpse(), str(), summary()`following are the observation drawn
+
+1.  Date format has Full week, month and year with century structure
+
+2.  most of the columns which are in num class needs to be changed
+
+3.  for further understanding data cleaning is required
+
+    ```{r}
+    stroke_dt$gender <- as.factor(stroke_dt$gender)
+    stroke_dt$ever_married <- as.factor(stroke_dt$ever_married)
+    stroke_dt$work_type <- as.factor(stroke_dt$work_type)
+    stroke_dt$Residence_type <- as.factor(stroke_dt$Residence_type)
+    stroke_dt$smoking_status <- as.factor(stroke_dt$smoking_status)
+    stroke_dt$bmi <- as.integer(stroke_dt$bmi)
+    ```
+
+    To work with values in character class data coercion is required
+    Using factor function on these character class values a value can
+    be established 
+
+    ```{r}
+    # checking the factor result 
+    str(stroke_dt)
+    summary(stroke_dt)
+    ```
+
+    Changing date structure
+
+    ```{r}
+    # Check for repeating ids 
+    dim(stroke_dt[duplicated(stroke_dt$id),])[1]
+    # Since there are no continuous records for same id we will not use date 
+    # there is no need for converting date column 
+    ```
+
+    Checking for NA
+
+    ```{r}
+    colSums(is.na(stroke_dt))
+    ```
+
+    Only bmi has NA values. Further consideration is required to make 
+    a decision on bmi NA's
+
+    ```{r}
+    bmi_na_percentage <- (sum(is.na(stroke_dt$bmi))/length(stroke_dt$bmi)*100)
+    percentage_of_Bmi_stroke <- (sum(stroke_dt$stroke                                                                                [is.na(stroke_dt$bmi)])/
+                                    sum(stroke_dt$stroke >= 1)*100)
+    percentage_of_Bmi_stroke
+    bmi_na_percentage
+    ```
+
+    Overall NA % in BMI is 3.93%.That holds a 16.06% of instance where stroke
+    occurred.
+    Repleacing these NA's with mean value is a better option considering their 
+    effect on stroke data
+
+    ```{r}
+    # Replace the missing values with mean of bmi attribute
+    stroke_dt$bmi[is.na(stroke_dt$bmi)] <- mean(stroke_dt$bmi,na.rm = TRUE)
+    sum(is.na(stroke_dt$bmi))
+    ```
+
+    ```{r}
+    summary(stroke_dt)
+    
+    ```
+    writing the completed source file 
+```{r}
+  write.csv(stroke_dt, file = "stroke.csv")
+```
+    
+    
